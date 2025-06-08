@@ -1,0 +1,29 @@
+name: Update ICS Calendar
+
+on:
+  schedule:
+    - cron: '0 4 * * 5'
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: pip install pandas
+      - name: Generate ICS
+        run: python generate_ics.py
+      - name: Commit updated ICS
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add MODS_OGM_Fixtures.ics
+          git commit -m "Update ICS file" || echo "No changes to commit"
+          git push
